@@ -2,6 +2,7 @@ package com.sdk.courier.exception;
 
 
 import java.net.URI;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -30,9 +31,13 @@ public abstract class ResponseHandler {
      * @param responseBody  the response body from the server, which may contain error details.
      */
     public void processResponse(int statusCode, URI requestUri, String responseBody) {
-        if (!successStatusCodes.contains(statusCode)) {
-            handleError(statusCode, requestUri, responseBody);
-        }
+        Optional.of(statusCode)
+                .filter(code-> !
+                        successStatusCodes.contains(code))
+               .ifPresent(code -> handleError(
+                       code,
+                       requestUri,
+                       responseBody));
     }
 
     /**
