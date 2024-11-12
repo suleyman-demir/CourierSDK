@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdk.courier.exception.CourierServiceException;
 import com.sdk.courier.model.Courier;
+import lombok.Setter;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * The CourierServiceClient is responsible for handling HTTP requests to interact with
@@ -18,6 +21,18 @@ public class CourierServiceClient {
     private final String baseUrl;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+
+    /**
+     * -- SETTER --
+     *  Sets the HTTP status codes that should be considered successful.
+     *
+     * @param successStatusCodes a Set of HTTP status codes that represent successful responses.
+     */
+
+
+    // Varsayılan olarak 200'ü Kabul kodu olarak atadım
+    @Setter
+    private Set<Integer> successStatusCodes = new HashSet<>(Set.of(200));
 
     /**
      * Constructs a new CourierServiceClient with the specified base URL.
@@ -49,15 +64,22 @@ public class CourierServiceClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new CourierServiceException("Failed to add courier", response.statusCode());
+            // response.statusCode() başarısızsa özel bir exception fırlatıyoruz.
+            if (!successStatusCodes.contains(response.statusCode())) {
+                throw new CourierServiceException(
+                        "Failed to add courier",
+                        response.statusCode(),
+                        request.uri(),
+                        response.body()
+                );
             }
+
             return objectMapper.readValue(response.body(), Courier.class);
 
         } catch (JsonProcessingException e) {
-            throw new CourierServiceException("Failed to process courier JSON", 500, e);
+            throw new CourierServiceException("Failed to process courier JSON", 500, null, "", e);
         } catch (Exception e) {
-            throw new CourierServiceException("Failed to send add courier request", 500, e);
+            throw new CourierServiceException("Failed to send add courier request", 500, null, "", e);
         }
     }
 
@@ -77,16 +99,21 @@ public class CourierServiceClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new CourierServiceException("Failed to get courier", response.statusCode());
+            if (!successStatusCodes.contains(response.statusCode())) {
+                throw new CourierServiceException(
+                        "Failed to get courier",
+                        response.statusCode(),
+                        request.uri(),
+                        response.body()
+                );
             }
 
             return objectMapper.readValue(response.body(), Courier.class);
 
         } catch (JsonProcessingException e) {
-            throw new CourierServiceException("Failed to process courier JSON", 500, e);
+            throw new CourierServiceException("Failed to process courier JSON", 500, null, "", e);
         } catch (Exception e) {
-            throw new CourierServiceException("Failed to send get courier request", 500, e);
+            throw new CourierServiceException("Failed to send get courier request", 500, null, "", e);
         }
     }
 }

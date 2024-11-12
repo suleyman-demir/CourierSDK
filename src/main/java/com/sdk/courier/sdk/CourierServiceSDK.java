@@ -10,9 +10,8 @@ import java.util.concurrent.CompletableFuture;
  * SDK class for interacting with the Courier Service API asynchronously and synchronously.
  * Provides methods to add and retrieve couriers through HTTP requests to the specified base URL.
  */
-public class CourierServiceSDK {
-    public static final String BASE_URL = "http://localhost:8081/v1/api/deliveryy";
 
+public class CourierServiceSDK {
     private final CourierServiceClient courierServiceClient;
 
     /**
@@ -24,12 +23,6 @@ public class CourierServiceSDK {
         this.courierServiceClient = courierServiceClient;
     }
 
-    /**
-     * Constructs a CourierServiceSDK instance with a default base URL.
-     */
-    public CourierServiceSDK() {
-        this.courierServiceClient = new CourierServiceClient(BASE_URL);
-    }
 
     /**
      * Asynchronously retrieves a courier by its ID.
