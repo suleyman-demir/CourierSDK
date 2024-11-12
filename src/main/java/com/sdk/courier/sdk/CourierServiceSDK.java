@@ -10,8 +10,8 @@ import java.util.concurrent.CompletableFuture;
  * SDK class for interacting with the Courier Service API asynchronously and synchronously.
  * Provides methods to add and retrieve couriers through HTTP requests to the specified base URL.
  */
-
 public class CourierServiceSDK {
+
     private final CourierServiceClient courierServiceClient;
 
     /**
@@ -23,7 +23,6 @@ public class CourierServiceSDK {
         this.courierServiceClient = courierServiceClient;
     }
 
-
     /**
      * Asynchronously retrieves a courier by its ID.
      *
@@ -33,11 +32,7 @@ public class CourierServiceSDK {
      */
     public CompletableFuture<Courier> asyncExecuteGetCourier(Long courierId) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                return courierServiceClient.getCourier(courierId);
-            } catch (CourierServiceException e) {
-                throw new RuntimeException("Failed to asynchronously get courier", e);
-            }
+            return courierServiceClient.getCourier(courierId);
         });
     }
 
@@ -72,11 +67,7 @@ public class CourierServiceSDK {
      */
     public CompletableFuture<Courier> asyncExecuteAddCourier(Courier courier) {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                return courierServiceClient.addCourier(courier);
-            } catch (CourierServiceException e) {
-                throw new RuntimeException("Failed to asynchronously add courier", e);
-            }
+            return courierServiceClient.addCourier(courier);
         });
     }
 }

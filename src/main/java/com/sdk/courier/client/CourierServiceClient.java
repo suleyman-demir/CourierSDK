@@ -2,6 +2,7 @@ package com.sdk.courier.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sdk.courier.exception.CourierResponseHandler;
 import com.sdk.courier.exception.CourierServiceException;
 import com.sdk.courier.model.Courier;
 import lombok.Setter;
@@ -21,6 +22,7 @@ public class CourierServiceClient {
     private final String baseUrl;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final CourierResponseHandler responseHandler;
 
     /**
      * -- SETTER --
@@ -28,9 +30,6 @@ public class CourierServiceClient {
      *
      * @param successStatusCodes a Set of HTTP status codes that represent successful responses.
      */
-
-
-    // Varsayılan olarak 200'ü Kabul kodu olarak atadım
     @Setter
     private Set<Integer> successStatusCodes = new HashSet<>(Set.of(200));
 
@@ -43,6 +42,7 @@ public class CourierServiceClient {
         this.baseUrl = baseUrl;
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
+        this.responseHandler = new CourierResponseHandler(successStatusCodes);
     }
 
     /**
@@ -64,15 +64,8 @@ public class CourierServiceClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // response.statusCode() başarısızsa özel bir exception fırlatıyoruz.
-            if (!successStatusCodes.contains(response.statusCode())) {
-                throw new CourierServiceException(
-                        "Failed to add courier",
-                        response.statusCode(),
-                        request.uri(),
-                        response.body()
-                );
-            }
+            //STATUS CODE CHECK
+            responseHandler.processResponse(response.statusCode(), request.uri(), response.body());
 
             return objectMapper.readValue(response.body(), Courier.class);
 
@@ -99,14 +92,8 @@ public class CourierServiceClient {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (!successStatusCodes.contains(response.statusCode())) {
-                throw new CourierServiceException(
-                        "Failed to get courier",
-                        response.statusCode(),
-                        request.uri(),
-                        response.body()
-                );
-            }
+            //STATUS CODE CHECK
+            responseHandler.processResponse(response.statusCode(), request.uri(), response.body());
 
             return objectMapper.readValue(response.body(), Courier.class);
 

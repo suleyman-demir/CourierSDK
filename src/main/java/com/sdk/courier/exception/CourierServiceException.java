@@ -3,15 +3,12 @@ package com.sdk.courier.exception;
 import lombok.Getter;
 
 import java.net.URI;
-import java.util.Map;
 
 /**
  * A custom exception class for handling errors specific to the Courier Service SDK.
- * <p>
- * This exception encapsulates details such as the HTTP status code, request URI, headers,
- * and a descriptive error message, providing additional context about the failure encountered
- * when interacting with the Courier Service API.
- * </p>
+ * This exception encapsulates details such as the HTTP status code, request URI, and
+ * response body, providing additional context about the failure encountered when
+ * interacting with the Courier Service API.
  */
 @Getter
 public class CourierServiceException extends RuntimeException {
@@ -26,7 +23,6 @@ public class CourierServiceException extends RuntimeException {
      */
     private final URI requestUri;
 
-
     /**
      * The response body received from the server, which might contain additional error details.
      */
@@ -34,12 +30,12 @@ public class CourierServiceException extends RuntimeException {
 
     /**
      * Constructs a new CourierServiceException with the specified detail message, HTTP status code,
-     * request URI, response headers, and response body.
+     * request URI, and response body.
      *
-     * @param message the detail message describing the nature of the error.
-     * @param statusCode the HTTP status code from the failed request, providing additional context.
-     * @param requestUri the URI used in the failed request, for tracking the API endpoint.
-     * @param responseBody the response body from the server, which may contain error details.
+     * @param message       the detail message describing the nature of the error.
+     * @param statusCode    the HTTP status code from the failed request, providing additional context.
+     * @param requestUri    the URI used in the failed request, for tracking the API endpoint.
+     * @param responseBody  the response body from the server, which may contain error details.
      */
     public CourierServiceException(String message, int statusCode, URI requestUri, String responseBody) {
         super(message);
@@ -50,13 +46,13 @@ public class CourierServiceException extends RuntimeException {
 
     /**
      * Constructs a new CourierServiceException with the specified detail message, HTTP status code,
-     * request URI, response headers, response body, and cause.
+     * request URI, response body, and cause.
      *
-     * @param message the detail message describing the nature of the error.
-     * @param statusCode the HTTP status code from the failed request, providing additional context.
-     * @param requestUri the URI used in the failed request, for tracking the API endpoint.
-     * @param responseBody the response body from the server, which may contain error details.
-     * @param cause the underlying cause of the exception, which may provide further details about the failure.
+     * @param message       the detail message describing the nature of the error.
+     * @param statusCode    the HTTP status code from the failed request, providing additional context.
+     * @param requestUri    the URI used in the failed request, for tracking the API endpoint.
+     * @param responseBody  the response body from the server, which may contain error details.
+     * @param cause         the underlying cause of the exception, which may provide further details about the failure.
      */
     public CourierServiceException(String message, int statusCode, URI requestUri, String responseBody, Throwable cause) {
         super(message, cause);
@@ -64,7 +60,4 @@ public class CourierServiceException extends RuntimeException {
         this.requestUri = requestUri;
         this.responseBody = responseBody;
     }
-
-
-
 }
