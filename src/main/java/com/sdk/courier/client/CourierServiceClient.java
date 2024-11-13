@@ -2,47 +2,40 @@ package com.sdk.courier.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sdk.courier.exception.CourierResponseHandler;
 import com.sdk.courier.exception.CourierServiceException;
 import com.sdk.courier.model.Courier;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * The CourierServiceClient is responsible for handling HTTP requests to interact with
  * the Courier Service API. It provides methods to add and retrieve courier information.
  */
+@Component
 public class CourierServiceClient {
     private final String baseUrl;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-    private final CourierResponseHandler responseHandler;
+    private final Set<Integer> successStatusCodes;
 
     /**
-     * -- SETTER --
-     *  Sets the HTTP status codes that should be considered successful.
-     *
-     * @param successStatusCodes a Set of HTTP status codes that represent successful responses.
-     */
-    @Setter
-    private Set<Integer> successStatusCodes = new HashSet<>(Set.of(200));
-
-    /**
-     * Constructs a new CourierServiceClient with the specified base URL.
+     * Constructs a new CourierServiceClient with the specified base URL and success status codes.
      *
      * @param baseUrl the base URL of the Courier Service API.
+     * @param successStatusCodes a set of HTTP status codes that are considered successful responses.
      */
-    public CourierServiceClient(String baseUrl) {
+    public CourierServiceClient(@Value("${baseUrl}")String baseUrl, Set<Integer> successStatusCodes) {
         this.baseUrl = baseUrl;
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
-        this.responseHandler = new CourierResponseHandler(successStatusCodes);
+        this.successStatusCodes = successStatusCodes;
     }
 
     /**
@@ -55,20 +48,14 @@ public class CourierServiceClient {
     public Courier addCourier(Courier courier) throws CourierServiceException {
         try {
             String requestBody = objectMapper.writeValueAsString(courier);
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl + "/addCourier"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                     .build();
-
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            //STATUS CODE CHECK
-            responseHandler.processResponse(response.statusCode(), request.uri(), response.body());
-
+            validateResponse(response);
             return objectMapper.readValue(response.body(), Courier.class);
-
         } catch (JsonProcessingException e) {
             throw new CourierServiceException("Failed to process courier JSON", 500, null, "", e);
         } catch (Exception e) {
@@ -89,18 +76,31 @@ public class CourierServiceClient {
                     .uri(URI.create(baseUrl + "/getCourier/" + courierId))
                     .GET()
                     .build();
-
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            //STATUS CODE CHECK
-            responseHandler.processResponse(response.statusCode(), request.uri(), response.body());
-
+            validateResponse(response);
             return objectMapper.readValue(response.body(), Courier.class);
-
         } catch (JsonProcessingException e) {
             throw new CourierServiceException("Failed to process courier JSON", 500, null, "", e);
         } catch (Exception e) {
             throw new CourierServiceException("Failed to send get courier request", 500, null, "", e);
+        }
+    }
+
+    /**
+     * Validates the HTTP response status code. Throws CourierServiceException if the status code
+     * is not within the successStatusCodes set.
+     *
+     * @param response the HTTP response to validate.
+     * @throws CourierServiceException if the response status code indicates a failure.
+     */
+    private void validateResponse(HttpResponse<String> response) throws CourierServiceException {
+        if (!successStatusCodes.contains(response.statusCode())) {
+            throw new CourierServiceException(
+                    "Unexpected response status: " + response.statusCode(),
+                    response.statusCode(),
+                    response.uri(),
+                    response.body()
+            );
         }
     }
 }
