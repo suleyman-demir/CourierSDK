@@ -2,6 +2,7 @@ package com.sdk.courier.sdk;
 
 import com.sdk.courier.client.CourierServiceClient;
 import com.sdk.courier.exception.CourierServiceException;
+import com.sdk.courier.exception.CourierErrorHandler;
 import com.sdk.courier.model.Courier;
 
 import java.util.concurrent.CompletableFuture;
@@ -28,11 +29,15 @@ public class CourierServiceSDK {
      *
      * @param courierId the ID of the courier to retrieve.
      * @return a CompletableFuture containing the requested Courier object.
-     * @throws CourierServiceException if the request fails or the courier cannot be found.
      */
     public CompletableFuture<Courier> asyncExecuteGetCourier(Long courierId) {
         return CompletableFuture.supplyAsync(() -> {
-            return courierServiceClient.getCourier(courierId);
+            try {
+                return courierServiceClient.getCourier(courierId);
+            } catch (CourierServiceException e) {
+                CourierErrorHandler.handleException(e);
+                throw e; // Exception'ı tekrar fırlatıyoruz, böylece asenkron işlemde de görünür.
+            }
         });
     }
 
@@ -44,7 +49,12 @@ public class CourierServiceSDK {
      * @throws CourierServiceException if the request fails or the courier cannot be found.
      */
     public Courier executeGetCourier(Long courierId) throws CourierServiceException {
-        return courierServiceClient.getCourier(courierId);
+        try {
+            return courierServiceClient.getCourier(courierId);
+        } catch (CourierServiceException e) {
+            CourierErrorHandler.handleException(e);
+            throw e;
+        }
     }
 
     /**
@@ -55,7 +65,12 @@ public class CourierServiceSDK {
      * @throws CourierServiceException if the request fails and the courier cannot be added.
      */
     public Courier executeAddCourier(Courier courier) throws CourierServiceException {
-        return courierServiceClient.addCourier(courier);
+        try {
+            return courierServiceClient.addCourier(courier);
+        } catch (CourierServiceException e) {
+            CourierErrorHandler.handleException(e);
+            throw e;
+        }
     }
 
     /**
@@ -63,11 +78,15 @@ public class CourierServiceSDK {
      *
      * @param courier the Courier object to be added.
      * @return a CompletableFuture containing the added Courier object.
-     * @throws CourierServiceException if the request fails and the courier cannot be added.
      */
     public CompletableFuture<Courier> asyncExecuteAddCourier(Courier courier) {
         return CompletableFuture.supplyAsync(() -> {
-            return courierServiceClient.addCourier(courier);
+            try {
+                return courierServiceClient.addCourier(courier);
+            } catch (CourierServiceException e) {
+                CourierErrorHandler.handleException(e);
+                throw e;
+            }
         });
     }
 }
