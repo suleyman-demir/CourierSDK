@@ -11,7 +11,6 @@ public class ExceptionHandlerRegistry {
     private final Map<Class<? extends SDKException>, ExceptionHandler<?>> handlers = new HashMap<>();
 
     public ExceptionHandlerRegistry() {
-        // Varsayılan handler'ları kaydet
         registerHandler(new ValidationExceptionHandler());
     }
 

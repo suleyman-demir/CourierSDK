@@ -26,7 +26,6 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(response, HttpStatus.valueOf(response.getHttpStatus()));
         }
 
-        // Varsayılan hata yanıtı
         ErrorResponse response = ErrorResponse.builder()
                 .errorCode("INTERNAL_ERROR")
                 .message("An unexpected error occurred")
