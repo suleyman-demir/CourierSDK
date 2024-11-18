@@ -6,15 +6,16 @@ import lombok.Data;
 @Data
 @Builder
 public class ValidationError {
-    private String field;
-    private String message;
-    private String code;
+    private String fieldName;
+    private String errorMessage;
+    private String errorCode;
 
-    public static ValidationError of(String field, String message, String code) {
+    public static ValidationError of(String fieldName, String errorMessage, String errorCode) {
         return ValidationError.builder()
-                .field(field)
-                .message(message)
-                .code(code)
+                .fieldName(fieldName)
+                .errorMessage(errorMessage)
+                .errorCode(errorCode)
                 .build();
     }
 }
+
