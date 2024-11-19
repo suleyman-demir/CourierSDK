@@ -1,6 +1,7 @@
 package com.sdk.courier.exception;
 
 import com.sdk.courier.model.ErrorResponse;
+import jakarta.annotation.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

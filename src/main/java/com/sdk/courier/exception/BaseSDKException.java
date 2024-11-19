@@ -20,3 +20,4 @@ public abstract class BaseSDKException extends RuntimeException implements SDKEx
         return httpStatus;
     }
 }
+

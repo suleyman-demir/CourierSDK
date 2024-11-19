@@ -15,13 +15,17 @@ public class ErrorResponse {
     private String message;
     private int httpStatus;
     private LocalDateTime timestamp;
+    private String exceptionType;
+//    private String handle;
 
     public static ErrorResponse fromException(SDKException exception) {
         return ErrorResponse.builder()
                 .errorCode(exception.getErrorCode())
                 .message(exception.getMessage())
                 .httpStatus(exception.getHttpStatus())
+                .exceptionType(exception.getClass().getSimpleName())
                 .timestamp(LocalDateTime.now())
+//                .handle(exception.getErrorCode())
                 .build();
     }
 }
