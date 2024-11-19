@@ -9,7 +9,7 @@ public class ValidationExceptionHandler extends BaseExceptionHandler<ValidationE
 
     @Override
     public ErrorResponse handle(ValidationException exception) {
-        // Customize the error response if needed
+
         return ErrorResponse.builder()
                 .errorCode(exception.getErrorCode())
                 .message(exception.getMessage())

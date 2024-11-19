@@ -12,16 +12,11 @@ public class ExceptionHandlerRegistry {
     private final Map<Class<? extends SDKException>, ExceptionHandler<?>> handlers = new HashMap<>();
 
     public ExceptionHandlerRegistry() {
-        // Burada varsayılan handler'lar kaydedilir
+
         registerHandler(new ValidationExceptionHandler());
     }
 
-    /**
-     * Yeni bir handler ekler.
-     *
-     * @param handler ExceptionHandler instance
-     * @throws IllegalArgumentException Null handler eklenmeye çalışıldığında
-     */
+
     public void registerHandler(ExceptionHandler<?> handler) {
         if (handler == null) {
             throw new IllegalArgumentException("Handler cannot be null.");
@@ -33,13 +28,7 @@ public class ExceptionHandlerRegistry {
         handlers.put(exceptionType, handler);
     }
 
-    /**
-     * Mevcut bir handler'ı yenisiyle değiştirir.
-     *
-     * @param exceptionType Exception türü
-     * @param newHandler    Yeni handler
-     * @throws IllegalArgumentException Null yeni handler sağlanırsa
-     */
+
     public void replaceHandler(Class<? extends SDKException> exceptionType, ExceptionHandler<?> newHandler) {
         if (newHandler == null) {
             throw new IllegalArgumentException("New handler cannot be null.");
@@ -47,21 +36,12 @@ public class ExceptionHandlerRegistry {
         handlers.put(exceptionType, newHandler);
     }
 
-    /**
-     * Belirtilen türdeki exception için handler'ı kaldırır.
-     *
-     * @param exceptionType Exception türü
-     */
+
     public void removeHandler(Class<? extends SDKException> exceptionType) {
         handlers.remove(exceptionType);
     }
 
-    /**
-     * Exception için uygun handler'ı bulur.
-     *
-     * @param exception Hata nesnesi
-     * @return Uygun handler, bulunamazsa boş Optional
-     */
+
     public Optional<ExceptionHandler<?>> findHandler(Throwable exception) {
         if (exception == null) {
             return Optional.empty();

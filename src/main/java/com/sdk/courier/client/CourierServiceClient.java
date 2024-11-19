@@ -2,7 +2,7 @@ package com.sdk.courier.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sdk.courier.exception.CourierServiceException;
+
 import com.sdk.courier.model.Courier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
